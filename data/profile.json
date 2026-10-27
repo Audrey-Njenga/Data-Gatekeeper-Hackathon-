@@ -1,0 +1,20 @@
+{
+  "fields": {
+    "preferred_name": { "value": "Chris", "tags": ["general"] },
+    "language": { "value": "en-GB", "tags": ["general"] },
+    "timezone": { "value": "Europe/London", "tags": ["general"] },
+    "home_city": { "value": "London", "tags": ["location"] },
+    "home_address": { "value": "12 Elm Road, London", "tags": ["location"] },
+    "email": { "value": "chris@example.com", "tags": ["people"] },
+    "phone": { "value": "+44 7700 900123", "tags": ["people"] },
+    "card_last4": { "value": "9910", "tags": ["financial"] },
+    "passport_number": { "value": "123456789", "tags": ["credentials"] },
+    "medical_notes": { "value": "Knee injury, avoid long hikes", "tags": ["health"] }
+  },
+  "preferences": {
+    "travel": { "seat": "window", "class": "economy", "max_flight_hours": 4, "likes": ["coastal towns", "food markets"], "departure_airport": "LHR" },
+    "dietary": { "restrictions": ["vegetarian"] },
+    "shopping": { "sizes": { "shoe": "UK 6" }, "brands_avoid": [] },
+    "communication": { "style": "concise", "never_send_messages_without_approval": true }
+  }
+}

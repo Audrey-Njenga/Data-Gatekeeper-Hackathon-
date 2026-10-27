@@ -1,0 +1,5 @@
+python-dotenv
+pytest
+# Google connector (later)
+google-api-python-client
+google-auth-oauthlib

@@ -1,0 +1,26 @@
+{
+  "timezone": "Europe/London",
+  "calendars": [
+    { "id": "work", "name": "Work", "source_tags": ["work"] },
+    { "id": "health", "name": "Health", "source_tags": ["health"] },
+    { "id": "finance", "name": "Finance", "source_tags": ["financial"] },
+    { "id": "personal", "name": "Personal", "source_tags": [] }
+  ],
+  "events": [
+    { "id": "e01", "calendar": "work", "title": "Team standup", "start": "2026-11-02T09:30:00", "end": "2026-11-02T09:45:00", "attendees": ["team@acme.example"], "notes": "" },
+    { "id": "e02", "calendar": "work", "title": "Q4 planning workshop", "start": "2026-11-03T10:00:00", "end": "2026-11-03T16:00:00", "attendees": ["lead@acme.example", "pm@acme.example"], "notes": "Bring roadmap draft" },
+    { "id": "e03", "calendar": "health", "title": "Physio appointment", "start": "2026-11-04T08:00:00", "end": "2026-11-04T09:00:00", "attendees": [], "notes": "Knee rehab session 4 of 8" },
+    { "id": "e04", "calendar": "finance", "title": "Mortgage advisor call", "start": "2026-11-05T13:00:00", "end": "2026-11-05T14:00:00", "attendees": ["advisor@homeloans.example"], "notes": "Discuss remortgage rate, bring payslips" },
+    { "id": "e05", "calendar": "personal", "title": "Call with Barclays re: loan", "start": "2026-11-06T11:00:00", "end": "2026-11-06T11:30:00", "attendees": [], "notes": "Account ending 4821" },
+    { "id": "e06", "calendar": "personal", "title": "Dinner with Sarah", "start": "2026-11-07T19:00:00", "end": "2026-11-07T22:00:00", "attendees": ["sarah@example.com"], "notes": "" },
+    { "id": "e07", "calendar": "work", "title": "Client offsite (Manchester)", "start": "2026-11-09T08:00:00", "end": "2026-11-11T18:00:00", "attendees": ["client@bigco.example"], "notes": "Hotel booked by office" },
+    { "id": "e08", "calendar": "health", "title": "Dentist", "start": "2026-11-12T15:00:00", "end": "2026-11-12T16:00:00", "attendees": [], "notes": "" },
+    { "id": "e09", "calendar": "work", "title": "Sprint review", "start": "2026-11-13T14:00:00", "end": "2026-11-13T15:30:00", "attendees": ["team@acme.example"], "notes": "" },
+    { "id": "e10", "calendar": "personal", "title": "Mum's birthday lunch", "start": "2026-11-15T12:00:00", "end": "2026-11-15T15:00:00", "attendees": ["mum@example.com"], "notes": "Home address: 12 Elm Road" },
+    { "id": "e11", "calendar": "work", "title": "Conference talk prep", "start": "2026-11-16T09:00:00", "end": "2026-11-18T17:00:00", "attendees": [], "notes": "" },
+    { "id": "e12", "calendar": "personal", "title": "Therapy session", "start": "2026-11-23T17:00:00", "end": "2026-11-23T18:00:00", "attendees": [], "notes": "" },
+    { "id": "e13", "calendar": "work", "title": "Board prep", "start": "2026-11-24T09:00:00", "end": "2026-11-26T18:00:00", "attendees": ["ceo@acme.example"], "notes": "Confidential" },
+    { "id": "e14", "calendar": "finance", "title": "Pay credit card bill", "start": "2026-11-27T09:00:00", "end": "2026-11-27T09:15:00", "attendees": [], "notes": "Card ending 9910, balance £1,240" },
+    { "id": "e15", "calendar": "personal", "title": "Gym", "start": "2026-11-28T10:00:00", "end": "2026-11-28T11:00:00", "attendees": [], "notes": "" }
+  ]
+}

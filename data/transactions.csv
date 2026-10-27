@@ -1,0 +1,8 @@
+date,merchant,amount_gbp,category
+2026-10-01,Tesco,54.20,groceries
+2026-10-03,TfL,32.00,transport
+2026-10-05,Amazon,89.99,shopping
+2026-10-08,Homeloans Ltd,1450.00,mortgage
+2026-10-12,Pret,6.40,food
+2026-10-15,British Airways,212.00,travel
+2026-10-20,Boots,18.75,health
