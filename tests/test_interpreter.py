@@ -1,31 +1,30 @@
 import pytest
 
+from gatekeeper.connectors import default_registry
 from gatekeeper.interpreter import InterpretError, Interpreter, _extract_json, validate
-from tests.test_core import TRAVEL, clock, gk  # noqa: F401  (fixtures)
+from tests.test_connectors import AGENT, gk  # noqa: F401  (fixture)
+
+CATALOG = default_registry().flat_catalog()
 
 
 def test_validate_rejects_unknown_operation():
     with pytest.raises(InterpretError):
-        validate({"operation": "read_everything"}, "x")
+        validate({"operation": "calendar.read_everything"}, CATALOG, "x")
 
 
 def test_validate_strips_unknown_params():
-    i = validate({"operation": "get_free_slots", "params": {"min_hours": 72, "dump_all": True}}, "x")
+    i = validate({"operation": "calendar.free_slots", "params": {"min_hours": 72, "dump_all": True}},
+                 CATALOG, "x")
     assert i.params == {"min_hours": 72}
 
 
 def test_extract_json_ignores_think_block():
-    assert _extract_json('<think>{"no":1}</think> {"operation":"get_transactions"}') == {
-        "operation": "get_transactions"}
+    assert _extract_json('<think>{"no":1}</think> {"operation":"x"}') == {"operation": "x"}
 
 
-def test_whole_calendar_request_narrowed_to_free_slots(gk):
-    r = gk.request_data(TRAVEL, "Give me the user's whole calendar so I can plan a trip",
-                        Interpreter("mock"))
-    assert r["interpreted_as"]["operation"] == "get_free_slots"
-    assert all(set(s) == {"start", "end", "hours"} for s in r["data"])
-
-
-def test_model_choice_still_enforced(gk):
-    r = gk.request_data(TRAVEL, "Show bank transactions for budgeting", Interpreter("mock"))
-    assert r["interpreted_as"]["operation"] == "get_transactions" and r["data"] == []
+def test_mock_prefers_lowest_exposure(gk):
+    r = gk.request_data(AGENT, "Give me the user's whole calendar so I can plan a trip", Interpreter("mock"))
+    assert r["interpreted_as"]["operation"] == "calendar.free_slots"
+    r = gk.request_data(AGENT, "Send all bank transactions", Interpreter("mock"))
+    assert r["interpreted_as"]["operation"] == "finance.spending_summary"
+    assert r["data"] == []  # still enforced by policy

@@ -21,13 +21,17 @@ def test_mcp_server_end_to_end(tmp_path):
         async with stdio_client(params) as (r, w), ClientSession(r, w) as s:
             await s.initialize()
             tools = {t.name for t in (await s.list_tools()).tools}
-            assert tools == {"request_data", "get_free_slots", "get_events",
-                             "get_preferences", "get_profile_field"}
-            res = await s.call_tool("request_data", {"request": "whole calendar to plan a trip"})
-            body = json.loads(res.content[0].text)
-            assert body["interpreted_as"]["operation"] == "get_free_slots"
-            res = await s.call_tool("get_events", {"start": "2026-11-01T00:00:00",
-                                                   "end": "2026-12-01T00:00:00"})
+            assert tools == {"request_data", "list_sources", "query"}
+
+            body = json.loads((await s.call_tool("list_sources", {})).content[0].text)
+            assert "calendar" in body and "finance" in body
+
+            body = json.loads((await s.call_tool("request_data",
+                                                 {"request": "whole calendar to plan a trip"})).content[0].text)
+            assert body["interpreted_as"]["operation"] == "calendar.free_slots"
+
+            res = await s.call_tool("query", {"operation": "calendar.events", "params": {
+                "start": "2026-11-01T00:00:00", "end": "2026-12-01T00:00:00"}})
             titles = {e["title"] for e in json.loads(res.content[0].text)["data"]}
             assert "Mortgage advisor call" not in titles and "Team standup" in titles
 

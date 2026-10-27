@@ -1,4 +1,7 @@
-"""Gatekeeper orchestration: grant check -> typed operation -> policy -> ledger."""
+"""Gatekeeper orchestration: grant check -> connector operation -> policy -> ledger.
+
+Source-agnostic: all data access goes through a connector Registry.
+"""
 from __future__ import annotations
 
 import uuid
@@ -6,23 +9,29 @@ from collections import Counter
 from datetime import datetime, timedelta, timezone
 from typing import Callable
 
+from .connectors import Context, Registry, default_registry
 from .models import CATEGORIES, Effect, Rule
 from .policy import PolicyEngine, template_rules
 from .store import Store
-from .transformers import OPERATIONS, DataBundle
 
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _op_matches(granted: list[str], operation: str) -> bool:
+    """Grant entries: '*', 'source.*', or 'source.op'."""
+    source = operation.split(".")[0]
+    return any(g in ("*", operation, f"{source}.*") for g in granted)
+
+
 class Gatekeeper:
-    def __init__(self, store: Store, data: DataBundle | None = None,
+    def __init__(self, store: Store, registry: Registry | None = None,
                  clock: Callable[[], datetime] = _utcnow, data_now: Callable[[], datetime] | None = None):
         self.store = store
-        self.data = data or DataBundle.load()
+        self.registry = registry or default_registry()
         self.clock = clock  # UTC, used for grants/ledger
-        self.data_now = data_now or (lambda: datetime.now())  # naive local, used for calendar defaults
+        self.data_now = data_now or (lambda: datetime.now())  # naive local, for relative defaults
         if not self.store.get_setting("template"):
             self.apply_template("balanced")
 
@@ -73,19 +82,19 @@ class Gatekeeper:
             return "revoked"
         if grant["expires_at"] <= self.clock():
             return "expired"
-        if "*" not in grant["operations"] and operation not in grant["operations"]:
+        if not _op_matches(grant["operations"], operation):
             return "operation_not_granted"
         return None
 
     def handle(self, agent: str, operation: str, params: dict | None = None,
                interpreted_from: str | None = None) -> dict:
-        params = params or {}
+        params = {k: v for k, v in (params or {}).items() if v is not None}
         entry = {"ts": self.clock().isoformat(), "agent": agent, "operation": operation,
                  "params": params, "interpreted_from": interpreted_from}
 
-        if operation not in OPERATIONS:
+        if operation not in self.registry:
             self.store.log({**entry, "outcome": "unknown_operation"})
-            return {"status": "error", "error": "unknown_operation", "available": sorted(OPERATIONS)}
+            return {"status": "error", "error": "unknown_operation", "available": sorted(self.registry.ops)}
 
         err = self._grant_error(agent, operation)
         if err:
@@ -93,7 +102,7 @@ class Gatekeeper:
             return {"status": "denied", "error": err}
 
         try:
-            items = OPERATIONS[operation](self.data, self.data_now(), **params)
+            items = self.registry.run(operation, Context(now=self.data_now()), params)
         except (TypeError, ValueError) as exc:
             self.store.log({**entry, "outcome": "bad_params"})
             return {"status": "error", "error": "bad_params", "detail": str(exc)}
@@ -127,7 +136,8 @@ class Gatekeeper:
         """Free-text request -> model proposes a typed op -> normal enforcement path."""
         from .interpreter import InterpretError
         try:
-            interp = interpreter.interpret(request, today=self.data_now().date().isoformat())
+            interp = interpreter.interpret(request, self.registry.flat_catalog(),
+                                           today=self.data_now().date().isoformat())
         except InterpretError as exc:
             self.store.log({"ts": self.clock().isoformat(), "agent": agent, "operation": "request_data",
                             "params": {}, "outcome": "uninterpretable", "interpreted_from": request[:500]})
