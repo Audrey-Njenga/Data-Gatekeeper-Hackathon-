@@ -123,6 +123,19 @@ class Gatekeeper:
         return {"status": "ok", "operation": operation, "data": [i.data for i in released],
                 "withheld": len(hidden), "pending_approval": pending, "message": msg}
 
+    def request_data(self, agent: str, request: str, interpreter) -> dict:
+        """Free-text request -> model proposes a typed op -> normal enforcement path."""
+        from .interpreter import InterpretError
+        try:
+            interp = interpreter.interpret(request, today=self.data_now().date().isoformat())
+        except InterpretError as exc:
+            self.store.log({"ts": self.clock().isoformat(), "agent": agent, "operation": "request_data",
+                            "params": {}, "outcome": "uninterpretable", "interpreted_from": request[:500]})
+            return {"status": "error", "error": "uninterpretable", "detail": str(exc)}
+        result = self.handle(agent, interp.operation, interp.params, interpreted_from=request[:500])
+        return {**result, "interpreted_as": {"operation": interp.operation, "params": interp.params,
+                                             "reason": interp.reason, "backend": interp.backend}}
+
     # --- reporting -----------------------------------------------------
     def digest(self, since: datetime | None = None) -> dict:
         entries = [e for e in self.store.ledger(10_000)
