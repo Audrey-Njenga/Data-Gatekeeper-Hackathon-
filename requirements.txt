@@ -4,3 +4,4 @@ pytest
 google-api-python-client
 google-auth-oauthlib
 openai
+mcp>=2,<3
