@@ -18,7 +18,7 @@ def test_dashboard_flow():
     assert r.json()["pending_approval"] > 0
 
     ov = c.get("/api/overview").json()
-    assert ov["template"] == "balanced" and set(ov["sources"]) == {"calendar", "profile", "finance"}
+    assert ov["template"] == "balanced" and set(ov["sources"]) == {"calendar", "profile", "finance", "notes"}
     esc = ov["escalations"][0]
     rule = c.post(f"/api/escalations/{esc['id']}", json={"choice": "always"}).json()["rule"]
     assert rule.startswith("user:")

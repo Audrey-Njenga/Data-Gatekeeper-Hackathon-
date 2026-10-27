@@ -19,7 +19,7 @@ def gk():
 
 def test_catalog_lists_all_sources(gk):
     cat = gk.registry.catalog()
-    assert set(cat) == {"calendar", "profile", "finance"}
+    assert set(cat) == {"calendar", "profile", "finance", "notes"}
     assert cat["calendar"]["operations"]["free_slots"]["exposure"] == 1
 
 

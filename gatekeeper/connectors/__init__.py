@@ -6,6 +6,7 @@ from pathlib import Path
 from .base import Connector, Context, Operation, Registry
 from .calendar import CalendarConnector
 from .finance import FinanceConnector
+from .notes import NotesConnector
 from .profile import ProfileConnector
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -18,4 +19,5 @@ def default_registry(data_dir: Path = DATA_DIR) -> Registry:
         CalendarConnector(data_dir / "calendar.json"),
         ProfileConnector(data_dir / "profile.json"),
         FinanceConnector(data_dir / "transactions.csv"),
+        NotesConnector(data_dir / "notes"),
     ])

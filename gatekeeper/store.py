@@ -30,8 +30,12 @@ CREATE TABLE IF NOT EXISTS ledger(
 
 class Store:
     def __init__(self, path: str = ":memory:"):
-        self.db = sqlite3.connect(path, check_same_thread=False)
+        self.db = sqlite3.connect(path, check_same_thread=False, timeout=10)
         self.db.row_factory = sqlite3.Row
+        if path != ":memory:":
+            # API, MCP server(s) and scripts share this file concurrently
+            self.db.execute("PRAGMA journal_mode=WAL")
+            self.db.execute("PRAGMA busy_timeout=10000")
         self.db.executescript(SCHEMA)
 
     # settings
